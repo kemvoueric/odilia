@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    country: usa
+    run: apache
+  name: apache
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      run: apache
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        run: apache
+    spec:
+      containers:
+      - image: test:latest
+        name: apache
+        ports:
+        - containerPort: 80
+        resources: {}
+status: {}
