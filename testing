@@ -19,7 +19,7 @@ spec:
         run: apache
     spec:
       containers:
-      - image: nginx:01
+      - image: nginx:021
         name: apache
         ports:
         - containerPort: 80
