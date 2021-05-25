@@ -3,6 +3,8 @@
 UBUNTU_VERSION=20.04
 K8S_VERSION=1.19.2-00
 node_type=master
+LAYER=0
+IP=$(curl ifconfig.co)
 
 echo "Ubuntu version: ${UBUNTU_VERSION}"
 echo "K8s version: ${K8S_VERSION}"
@@ -59,7 +61,7 @@ fi
  sudo cp -f /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
-#if you are using a single node which acts as both a master and a worker
+
 #untaint the node so that pods will get scheduled:
 sudo kubectl taint nodes --all node-role.kubernetes.io/master-
 
@@ -67,16 +69,24 @@ sudo kubectl taint nodes --all node-role.kubernetes.io/master-
 sudo kubectl --kubeconfig=/etc/kubernetes/admin.conf create -f calico.yml
 
 sleep 60
-
+kubectl get node
 #   Install Helm 
     sudo chmod 700 helm.sh
     sudo ./helm.sh
 
+# install MetalLB
+kubectl get configmap kube-proxy -n kube-system -o yaml | sed -e "s/strictARP: false/strictARP: true/" | kubectl apply -f - -n kube-system
+kubectl apply -f metallb_namespace.yml
+kubectl apply -f metallb.yml
+kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
+kubectl create -f metallb_configmap.yml 
+kubectl -n metallb-system get all 
 # Install Gloo
 
 sudo kubectl create namespace gloo-system
-sudo helm install gloo .  -f gloo_offline_values.yaml  --namespace gloo-system
-sudo glooctl create vs warehouse
+cp  gloo_offline_values.yaml  gloo/
+cd gloo
+cp ../gloo_offline_values.yaml  gloo
+sudo helm install gloo . .  --namespace gloo-system
+kubectl -n  gloo-system get all 
 sudo  cd ..
-
-
