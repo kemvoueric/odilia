@@ -5,7 +5,8 @@ K8S_VERSION=1.19.2-00
 node_type=master
 LAYER=0
 IP=$(curl ifconfig.co)
-
+#HOSTNAME=rtsi
+#hostnamectl set-hostname $HOSTNAME
 echo "Ubuntu version: ${UBUNTU_VERSION}"
 echo "K8s version: ${K8S_VERSION}"
 echo "K8s node type: ${node_type}"
@@ -70,9 +71,9 @@ sudo kubectl --kubeconfig=/etc/kubernetes/admin.conf create -f calico.yml
 
 sleep 60
 kubectl get node
-#   Install Helm 
-    sudo chmod 700 helm.sh
-    sudo ./helm.sh
+# Install Helm 
+sudo chmod 700 helm.sh
+sudo ./helm.sh
 
 # install MetalLB
 kubectl get configmap kube-proxy -n kube-system -o yaml | sed -e "s/strictARP: false/strictARP: true/" | kubectl apply -f - -n kube-system
@@ -80,13 +81,12 @@ kubectl apply -f metallb_namespace.yml
 kubectl apply -f metallb.yml
 kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
 kubectl create -f metallb_configmap.yml 
+sleep 30
 kubectl -n metallb-system get all 
 # Install Gloo
 
 sudo kubectl create namespace gloo-system
-cp  gloo_offline_values.yaml  gloo/
-cd gloo
-cp ../gloo_offline_values.yaml  gloo
-sudo helm install gloo . .  --namespace gloo-system
+sudo helm install gloo ./gloo   --namespace gloo-system
 kubectl -n  gloo-system get all 
-sudo  cd ..
+sleep 30
+
