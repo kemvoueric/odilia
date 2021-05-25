@@ -1,0 +1,227 @@
+accessLogger:
+  enabled: false
+  fsGroup: 0
+  image:
+    extended: false
+    repository: access-logger
+    tag: 1.7.7
+  port: 8083
+  replicas: 1
+  runAsUser: 10101
+  serviceName: AccessLog
+  stats:
+    enabled: true
+crds:
+  create: false
+discovery:
+  deployment:
+    floatingUserId: false
+    fsGroup: 10101
+    image:
+      extended: false
+      repository: discovery
+      tag: 1.7.7
+    replicas: 1
+    runAsUser: 10101
+  enabled: true
+  fdsMode: WHITELIST
+  serviceAccount:
+    disableAutomount: false
+gateway:
+  certGenJob:
+    enabled: true
+    floatingUserId: false
+    image:
+      extended: false
+      repository: certgen
+      tag: 1.7.7
+    restartPolicy: OnFailure
+    runAsUser: 10101
+    setTtlAfterFinished: true
+    ttlSecondsAfterFinished: 60
+  deployment:
+    floatingUserId: false
+    image:
+      extended: false
+      repository: gateway
+      tag: 1.7.7
+    replicas: 1
+    runAsUser: 10101
+  enabled: true
+  proxyServiceAccount:
+    disableAutomount: false
+  readGatewaysFromAllNamespaces: false
+  serviceAccount:
+    disableAutomount: false
+  updateValues: false
+  validation:
+    allowWarnings: true
+    alwaysAcceptResources: true
+    disableTransformationValidation: false
+    enabled: true
+    failurePolicy: Ignore
+    secretName: gateway-validation-certs
+    webhook:
+      disableHelmHook: false
+      enabled: true
+gatewayProxies:
+  gatewayProxy:
+    antiAffinity: false
+    configMap:
+      data: null
+    envoyApiVersion: V3
+    envoyBootstrapExtensions: null
+    envoyStaticClusters: null
+    failover:
+      enabled: false
+      port: 15443
+      secretName: failover-downstream
+    gatewaySettings:
+      accessLoggingService: {}
+      disableGeneratedGateways: false
+      options: {}
+      useProxyProto: false
+    globalDownstreamMaxConnections: 250000
+    healthyPanicThreshold: 50
+    kind:
+      deployment:
+        replicas: 1
+    loopBackAddress: 127.0.0.1
+    podTemplate:
+      customReadinessProbe: {}
+      disableNetBind: true
+      floatingUserId: false
+      fsGroup: 10101
+      gracefulShutdown:
+        enabled: false
+        sleepTimeSeconds: 25
+      httpPort: 8080
+      httpsPort: 8443
+      image:
+        extended: false
+        repository: gloo-envoy-wrapper
+        tag: 1.7.7
+      probes: false
+      runAsUser: 10101
+      runUnprivileged: true
+      terminationGracePeriodSeconds: 0
+      tolerations: null
+    readConfig: false
+    readConfigMulticluster: false
+    service:
+      httpPort: 80
+      httpsFirst: false
+      httpsPort: 443
+      type: LoadBalancer
+global:
+  extauthCustomYaml: true
+  extraSpecs: false
+  glooMtls:
+    enabled: false
+    envoy:
+      image:
+        extended: false
+        repository: gloo-envoy-wrapper
+        tag: 1.7.7
+    sds:
+      image:
+        extended: false
+        repository: sds
+        tag: 1.7.7
+  glooRbac:
+    create: true
+    nameSuffix: ""
+    namespaced: false
+  glooStats:
+    enabled: true
+    routePrefixRewrite: /stats/prometheus
+  image:
+    extended: false
+    pullPolicy: IfNotPresent
+    registry: quay.io/solo-io
+  istioIntegration: {}
+  istioSDS: {}
+gloo:
+  deployment:
+    disableUsageStatistics: false
+    floatingUserId: false
+    image:
+      extended: false
+      repository: gloo
+      tag: 1.7.7
+    replicas: 1
+    restXdsPort: 9976
+    runAsUser: 10101
+    validationPort: 9988
+    xdsPort: 9977
+  serviceAccount:
+    disableAutomount: false
+ingress:
+  customIngressClass: null
+  deployment:
+    floatingUserId: false
+    image:
+      extended: false
+      repository: ingress
+      tag: 1.7.7
+    replicas: 1
+    runAsUser: 10101
+  enabled: false
+  requireIngressClass: null
+ingressProxy:
+  configMap: {}
+  deployment:
+    floatingUserId: false
+    httpPort: 8080
+    httpsPort: 8443
+    image:
+      extended: false
+      repository: gloo-envoy-wrapper
+      tag: 1.7.7
+    replicas: 1
+    runAsUser: 0
+  label: ingress-proxy
+  loopBackAddress: 127.0.0.1
+  service:
+    httpPort: 80
+    httpsPort: 443
+    type: LoadBalancer
+k8s:
+  clusterName: cluster.local
+namespace:
+  create: false
+settings:
+  aws:
+    enableCredentialsDiscovery: false
+    enableServiceAccountCredentials: false
+    stsCredentialsRegion: ""
+  create: true
+  disableKubernetesDestinations: false
+  disableProxyGarbageCollection: false
+  enableRestEds: true
+  integrations:
+    consul: null
+    consulUpstreamDiscovery: null
+    knative:
+      enabled: false
+      proxy:
+        httpPort: 8080
+        httpsPort: 8443
+        image:
+          extended: false
+          repository: gloo-envoy-wrapper
+          tag: 1.7.7
+        loopBackAddress: 127.0.0.1
+        replicas: 1
+        service:
+          httpPort: 80
+          httpsPort: 443
+          type: LoadBalancer
+      requireIngressClass: null
+      version: 0.10.0
+  invalidConfigPolicy:
+    invalidRouteResponseBody: Gloo Gateway has invalid configuration. Administrators should run `glooctl check` to find and fix config errors.
+    invalidRouteResponseCode: 404
+  linkerd: false
+  regexMaxProgramSize: 0
+  singleNamespace: false
