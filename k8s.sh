@@ -66,7 +66,7 @@ sudo kubectl taint nodes --all node-role.kubernetes.io/master-
 #Install Calico network
 sudo kubectl --kubeconfig=/etc/kubernetes/admin.conf create -f calico.yml
 
-
+sleep 60
 
 #   Install Helm 
     sudo chmod 700 helm.sh
@@ -77,7 +77,6 @@ sudo kubectl --kubeconfig=/etc/kubernetes/admin.conf create -f calico.yml
 sudo kubectl create namespace gloo-system
 sudo helm install gloo .  -f gloo_offline_values.yaml  --namespace gloo-system
 sudo glooctl create vs warehouse
-#sudo  cd ..
-
+sudo  cd ..
 
 

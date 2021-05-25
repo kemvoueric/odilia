@@ -1,0 +1,48 @@
+accessLogger:
+  enabled: false
+discovery:
+  deployment:
+    image:
+      repository: discovery
+      tag: 1.5.0
+gateway:
+  certGenJob:
+    image:
+      repository: certgen
+      tag: 1.5.0
+  deployment:
+    image:
+      repository: gateway
+      tag: 1.5.0
+gatewayProxies:
+  gatewayProxy:
+    service:
+      type: NodePort
+      httpNodePort: 31080
+      httpsNodePort: 31443
+    podTemplate:
+      image:
+        repository: gloo-envoy-wrapper
+        tag: 1.5.0
+global:
+  glooMtls:
+    enabled: false
+  image:
+    pullPolicy: IfNotPresent
+    registry: quay.io/solo-io
+gloo:
+  deployment:
+    image:
+      repository: gloo
+      tag: 1.5.0
+ingress:
+  enabled: false
+ingressProxy:
+  deployment:
+    image:
+      repository: gloo-envoy-wrapper
+      tag: 1.5.0
+settings:
+  integrations:
+    knative:
+      enabled: false
