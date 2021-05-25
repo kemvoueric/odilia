@@ -1,10 +1,22 @@
 #!/bin/bash
 
+############Environment variable
+TAG=001
+A=busybox
+B=centos
+C=mariadb
+D=mongo
+E=node
+F=postgres
+G=redis
+H=ubuntu
+I=mysql
 UBUNTU_VERSION=20.04
 K8S_VERSION=1.19.2-00
 node_type=master
 LAYER=0
 IP=$(curl ifconfig.co)
+
 #HOSTNAME=rtsi
 #hostnamectl set-hostname $HOSTNAME
 echo "Ubuntu version: ${UBUNTU_VERSION}"
@@ -81,7 +93,7 @@ kubectl apply -f metallb_namespace.yml
 kubectl apply -f metallb.yml
 kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
 kubectl create -f metallb_configmap.yml 
-sleep 30
+sleep 60
 kubectl -n metallb-system get all 
 # Install Gloo
 
@@ -89,4 +101,32 @@ sudo kubectl create namespace gloo-system
 sudo helm install gloo ./gloo   --namespace gloo-system
 kubectl -n  gloo-system get all 
 sleep 30
+#create RTSI namespace
+kubectl ceate ns rtsi
+##############################load all images###################
+SAVE_IMAGES=$(ls -l docker-images)
+for i in $SAVE_IMAGES 
+do
+    
+docker load < $i
+done 
+################edit local hosts file
+echo "docker.local 127.0.0.1" >> /etc/hosts
+#######moving scrolld images ###########
+mkdir docker-images/scrolld.images/
+cp -r docker.repo.millgroup.club*  docker-images/scrolld.images/
+##############creating a local regisrty########
+docker run -d -p 5000:5000 --restart=always --name local-registry registry:2
+##############################
+for a  in  $A  $B  $C  $D  $E  $F   $G    $H   $I
+do
+docker tag $a docker.local:5000/${a} 
+done 
+for b  in $A  $B  $C  $D  $E  $F   $G    $H   $I
+do
+docker push docker.local:5000/${b}
+done 
+#docker pull docker.local:5000/ubuntu
+
+
 
