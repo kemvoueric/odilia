@@ -102,7 +102,7 @@ sudo helm install gloo ./gloo   --namespace gloo-system
 kubectl -n  gloo-system get all 
 sleep 30
 #create RTSI namespace
-kubectl ceate ns rtsi
+kubectl create ns rtsi
 ##############################load all images###################
 SAVE_IMAGES=$(ls -l docker-images)
 for i in $SAVE_IMAGES 
@@ -112,9 +112,6 @@ docker load < $i
 done 
 ################edit local hosts file
 echo "docker.local 127.0.0.1" >> /etc/hosts
-#######moving scrolld images ###########
-mkdir docker-images/scrolld.images/
-cp -r docker.repo.millgroup.club*  docker-images/scrolld.images/
 ##############creating a local regisrty########
 docker run -d -p 5000:5000 --restart=always --name local-registry registry:2
 ##############################
@@ -127,6 +124,5 @@ do
 docker push docker.local:5000/${b}
 done 
 #docker pull docker.local:5000/ubuntu
-
 
 
